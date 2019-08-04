@@ -19,6 +19,7 @@ pragma solidity >=0.5.0;
 
 contract TokenLike {
     function transferFrom(address,address,uint) public;
+    function approve(address, uint) external returns (bool);
 }
 
 contract VatLike {
@@ -44,9 +45,13 @@ contract Dealer {
     JoinLike public joind;
 
     uint256 constant ONE = 10 ** 27;
+   
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
 
     function div(uint x, uint y) internal pure returns (uint z) {
-        z = x / y / ONE;
+        z = x / y;
     }
 
     constructor(address vat_, address dai_, address chai_, address joinc_, address joind_, address pot_) public {
@@ -59,6 +64,9 @@ contract Dealer {
 
         vat.hope(address(joinc));
         vat.hope(address(joind));
+        dai.approve(address(joind), uint(-1));
+        chai.approve(address(joinc), uint(-1));
+
     }
 
     // move dai to chai 
@@ -70,7 +78,7 @@ contract Dealer {
 
     // move chai to dai
     function take(uint wad) external {
-        uint lot = div(wad, pot.chi());
+        uint lot = div(mul(ONE, wad), pot.chi());
         chai.transferFrom(msg.sender, address(this), lot);
         joinc.join(address(this), wad);
         joind.exit(msg.sender, wad);

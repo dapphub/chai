@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+BIN_DIR=${BIN_DIR:-$(cd "${0%/*}"&&pwd)}
+source $BIN_DIR/lib/load-addresses
+
+ADDRESS_DIR=${ADDRESS_DIR:-$PWD/addresses}
+mkdir -p $ADDRESS_DIR 
+
+export ETH_GAS=${ETH_GAS:-"7000000"}
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+export SOLC_FLAGS="--optimize"
+
+
+loadAddresses $MCD_CONFIG 
+loadAddresses "$ADDRESS_DIR/addresses-$(seth chain).json"
+set -ex
+
+#mcd -J $MCD_CONFIG wrap $1
+#mcd -J $MCD_CONFIG --ilk=ETH-A gem join $1
+#mcd -J $MCD_CONFIG --ilk=ETH-A frob $1 $2
+#mcd -J $MCD_CONFIG dai exit $2
+
+seth send $DEALER "make(uint)" $2
+
+echo "CHAI: $(mcd --to-wad $(seth call $CHAI "balanceOf(address)(uint)" $ETH_FROM))"
+echo "DAI:  $(mcd --to-wad $(seth call $MCD_DAI "balanceOf(address)(uint)" $ETH_FROM))"

@@ -28,6 +28,7 @@ contract TokenLike {
 
 contract VatLike {
     function move(address,address,uint) external;
+    function hope(address) external;
 }
 
 
@@ -46,18 +47,20 @@ contract ChaiJoin {
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
+
     function div(uint x, uint y) internal pure returns (uint z) {
-        z = x / y / ONE;
+        z = x / y;
     }
 
     constructor(address vat_, address chai_, address pot_) public {
         vat = VatLike(vat_);
         chai = TokenLike(chai_);
         pot = PotLike(pot_);
+        vat.hope(pot_);
     }
 
     function join(address usr, uint wad) public {
-        uint lot = div(wad, pot.chi());
+        uint lot = div(mul(ONE, wad), pot.chi());
         pot.exit(lot);
         chai.burn(msg.sender, lot);
         vat.move(address(this), usr, mul(ONE, wad));
@@ -65,8 +68,8 @@ contract ChaiJoin {
 
     function exit(address usr, uint wad) public {
         vat.move(msg.sender, address(this), mul(ONE, wad));
-        pot.join(wad);
-        uint lot = div(wad, pot.chi());
+        uint lot = div(mul(ONE, wad), pot.chi());
+        pot.join(lot);
         chai.mint(usr, lot);
     }
 }

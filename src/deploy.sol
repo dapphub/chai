@@ -55,7 +55,7 @@ contract Deploy {
         joind = joind_;
 
         chai   = new Chai(chainId_);
-        joinc  = new ChaiJoin(vat,  address(chai), pot);
+        joinc  = new ChaiJoin(vat, address(chai), pot);
         chai.rely(address(joinc));
         chai.deny(address(this));
         dealer = new Dealer(vat, dai, address(chai), address(joinc), joind, pot);
