@@ -17,6 +17,25 @@ pragma solidity >=0.5.0;
 
 import "./lib.sol";
 
+contract VatLike {
+    function hope(address) external;
+}
+
+contract PotLike {
+    function chi() external returns (uint256);
+    function join(uint256) external;
+    function exit(uint256) external;
+}
+
+contract JoinLike {
+    function join(address, uint) external;
+    function exit(address, uint) external;
+}
+
+contract GemLike {
+    function transferFrom(address,address,uint) external returns (bool);
+}
+
 contract Chai is DSNote {
     // --- Auth ---
     mapping (address => uint) public wards;
@@ -24,8 +43,15 @@ contract Chai is DSNote {
     function deny(address guy) external note auth { wards[guy] = 0; }
     modifier auth { require(wards[msg.sender] == 1); _; }
 
+
+    // --- Data ---
+    VatLike  public vat;
+    PotLike  public pot;
+    GemLike  public dai;
+    JoinLike public daiJoin;
+
     // --- ERC20 Data ---
-    string  public constant name     = "Chai Stablecoin";
+    string  public constant name     = "Chai";
     string  public constant symbol   = "CHAI";
     string  public constant version  = "1";
     uint8   public constant decimals = 18;
@@ -39,11 +65,18 @@ contract Chai is DSNote {
     event Transfer(address indexed src, address indexed dst, uint wad);
 
     // --- Math ---
+    uint constant ONE = 10 ** 27;
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x);
     }
     function sub(uint x, uint y) internal pure returns (uint z) {
         require((z = x - y) <= x);
+    }
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+    function div(uint x, uint y) internal pure returns (uint z) {
+        z = x / y;
     }
 
     // --- EIP712 niceties ---
@@ -52,7 +85,7 @@ contract Chai is DSNote {
         "Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"
     );
 
-    constructor(uint256 chainId_) public {
+    constructor(uint256 chainId_, address vat_, address join_, address pot_, address dai_) public {
         wards[msg.sender] = 1;
         DOMAIN_SEPARATOR = keccak256(abi.encode(
             keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
@@ -61,6 +94,15 @@ contract Chai is DSNote {
             chainId_,
             address(this)
         ));
+
+        vat = VatLike(vat_);
+        pot = PotLike(pot_);
+        daiJoin = JoinLike(join_);
+        dai = GemLike(dai_);
+
+        vat.hope(join_);
+        vat.hope(pot_);
+
     }
 
     // --- Token ---
@@ -80,12 +122,22 @@ contract Chai is DSNote {
         emit Transfer(src, dst, wad);
         return true;
     }
-    function mint(address usr, uint wad) external auth {
-        balanceOf[usr] = add(balanceOf[usr], wad);
-        totalSupply    = add(totalSupply, wad);
-        emit Transfer(address(0), usr, wad);
+
+    // wad is denominated in dai
+    function join(address usr, uint wad) external auth {
+        dai.transferFrom(msg.sender, address(this), wad);
+
+        daiJoin.join(address(this), wad);
+        uint pie = div(mul(ONE, wad), pot.chi());
+        pot.join(pie);
+
+        balanceOf[usr] = add(balanceOf[usr], pie);
+        totalSupply    = add(totalSupply, pie);
+        emit Transfer(address(0), usr, pie);
     }
-    function burn(address usr, uint wad) external {
+
+    // wad is denominated in pie
+    function exit(address usr, uint wad) external {
         require(balanceOf[usr] >= wad, "chai/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
             require(allowance[usr][msg.sender] >= wad, "chai/insufficient-allowance");
@@ -93,6 +145,9 @@ contract Chai is DSNote {
         }
         balanceOf[usr] = sub(balanceOf[usr], wad);
         totalSupply    = sub(totalSupply, wad);
+
+        pot.exit(wad);
+        daiJoin.exit(msg.sender, div(mul(pot.chi(), wad), ONE));
         emit Transfer(usr, address(0), wad);
     }
     function approve(address usr, uint wad) external returns (bool) {
