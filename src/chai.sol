@@ -15,8 +15,6 @@
 
 pragma solidity >=0.5.0;
 
-import "./lib.sol";
-
 contract VatLike {
     function hope(address) external;
 }
@@ -36,7 +34,7 @@ contract GemLike {
     function transferFrom(address,address,uint) external returns (bool);
 }
 
-contract Chai is DSNote {
+contract Chai {
     // --- Data ---
     VatLike  public vat;
     PotLike  public pot;
@@ -138,16 +136,16 @@ contract Chai is DSNote {
 
     // --- Magic ---
     // wad is denominated in dai
-    function join(address usr, uint wad) internal {
+    function join(address usr, address dst, uint wad) internal {
         dai.transferFrom(usr, address(this), wad);
 
         daiJoin.join(address(this), wad);
         uint pie = div(mul(ONE, wad), pot.chi());
         pot.join(pie);
 
-        balanceOf[usr] = add(balanceOf[usr], pie);
+        balanceOf[dst] = add(balanceOf[dst], pie);
         totalSupply    = add(totalSupply, pie);
-        emit Transfer(address(0), usr, pie);
+        emit Transfer(address(0), dst, pie);
     }
     function join(uint wad) public {
         join(msg.sender, wad);
@@ -172,7 +170,7 @@ contract Chai is DSNote {
     }
 
     // wad is denominated in pie
-    function exit(address usr, uint wad) internal {
+    function exit(address usr, uint wad) public {
         require(balanceOf[usr] >= wad, "chai/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
             require(allowance[usr][msg.sender] >= wad, "chai/insufficient-allowance");
