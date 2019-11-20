@@ -147,8 +147,8 @@ contract Chai {
         totalSupply    = add(totalSupply, pie);
         emit Transfer(address(0), dst, pie);
     }
-    function join(uint wad) public {
-        join(msg.sender, wad);
+    function join(address dst, uint wad) public {
+        join(msg.sender, dst, wad);
     }
     function join(address usr, uint wad, uint fee, uint nonce, uint expiry, bytes32 r, bytes32 s, uint8 v, address taxman) public {
          bytes32 digest =
