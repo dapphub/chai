@@ -147,10 +147,10 @@ contract Chai {
         totalSupply    = add(totalSupply, pie);
         emit Transfer(address(0), dst, pie);
     }
-    function join(address dst, uint wad) public {
+    function join(address dst, uint wad) external {
         join(msg.sender, dst, wad);
     }
-    function join(address usr, uint wad, uint fee, uint nonce, uint expiry, bytes32 r, bytes32 s, uint8 v, address taxman) public {
+    function join(address usr, uint wad, uint fee, uint nonce, uint expiry, bytes32 r, bytes32 s, uint8 v, address taxman) external {
          bytes32 digest =
             keccak256(abi.encodePacked(
                 "\x19\x01",
@@ -183,11 +183,8 @@ contract Chai {
         daiJoin.exit(msg.sender, div(mul(pot.chi(), wad), ONE));
         emit Transfer(usr, address(0), wad);
     }
-    function exit(uint wad) public {
-        exit(msg.sender, wad);
-    }
     function exit(address usr, uint wad, uint fee, uint nonce, uint expiry,
-                  bytes32 r, bytes32 s, uint8 v, address taxman)  public {
+                  bytes32 r, bytes32 s, uint8 v, address taxman)  external {
          bytes32 digest =
             keccak256(abi.encodePacked(
                 "\x19\x01",
