@@ -51,7 +51,6 @@ contract ChaiSetup {
         dai = new Dai(99);
         daiJoin = new DaiJoin(address(vat), address(dai));
         vat.rely(address(pot));
-        // vat.hope(address(pot));
         dai.rely(address(daiJoin));
 
         // use a dummy vow

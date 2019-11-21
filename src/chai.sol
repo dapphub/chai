@@ -93,9 +93,9 @@ contract Chai {
             address(this)
         ));
 
-        vat = VatLike(vat_);
-        pot = PotLike(pot_);
-        daiJoin = JoinLike(join_);
+        vat      = VatLike(vat_);
+        pot      = PotLike(pot_);
+        daiJoin  = JoinLike(join_);
         daiToken = GemLike(dai_);
 
         vat.hope(join_);
