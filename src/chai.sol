@@ -150,14 +150,13 @@ contract Chai {
 
     // wad is denominated in dai
     function join(address dst, uint wad) external {
-        dai.transferFrom(msg.sender, address(this), wad);
-        daiJoin.join(address(this), wad);
-
         uint pie = rdiv(wad, pot.chi());
-        pot.join(pie);
-
         balanceOf[dst] = add(balanceOf[dst], pie);
         totalSupply    = add(totalSupply, pie);
+
+        dai.transferFrom(msg.sender, address(this), wad);
+        daiJoin.join(address(this), wad);
+        pot.join(pie);
         emit Transfer(address(0), dst, pie);
     }
 
