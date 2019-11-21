@@ -59,7 +59,7 @@ contract ChaiSetup {
         pot.file("vow", vow);
 
         // set up Chai
-        chai = new Chai(99, address(vat), address(pot), address(dai), address(daiJoin));
+        chai = new Chai(99, address(vat), address(pot), address(daiJoin), address(dai));
 
         // gives this 100 dai to play with
         vat.suck(address(this), address(this), rad(100 ether));
@@ -88,6 +88,7 @@ contract ChaiTest is DSTest, ChaiSetup {
         chai.join(address(this), 10 ether);
         assertEq(dai.balanceOf(address(this)),  90 ether);
         assertEq(chai.balanceOf(address(this)), 10 ether);
+        assertEq(chai.dai(address(this)), 10 ether);
         chai.exit(address(this), 10 ether);
         assertEq(chai.balanceOf(address(this)),  0 ether);
         assertEq(dai.balanceOf(address(this)), 100 ether);
@@ -102,8 +103,10 @@ contract ChaiTest is DSTest, ChaiSetup {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
         chai.join(address(this), 10 ether);
         assertEq(chai.balanceOf(address(this)), 10 ether);
+        assertEq(chai.dai(address(this)), 10 ether);
         hevm.warp(now + 1 days);
         assertEq(chai.balanceOf(address(this)), 10 ether);
+        assertEq(chai.dai(address(this)), 10 ether + 0.5 ether);
         chai.exit(address(this), 10 ether);
         assertEq(dai.balanceOf(address(this)), 100 ether + 0.5 ether);
     }
@@ -116,10 +119,12 @@ contract ChaiTest is DSTest, ChaiSetup {
         assertEq(chai.balanceOf(address(this)), 10 ether);
 
         pot.drip();
+        assertEq(chai.dai(address(this)), 10 ether + 0.5 ether);
         pot.file("dsr", uint(1000001103127689513476993127));  // 10% / day
 
         hevm.warp(now + 1 days);
         assertEq(chai.balanceOf(address(this)), 10 ether);
+        assertEq(chai.dai(address(this)), 10 ether + 1.55 ether);
         chai.exit(address(this), 10 ether);
         assertEq(dai.balanceOf(address(this)), 100 ether + 1.55 ether);
     }

@@ -42,8 +42,8 @@ contract Chai {
     // --- Data ---
     VatLike  public vat;
     PotLike  public pot;
-    GemLike  public dai;
     JoinLike public daiJoin;
+    GemLike  public daiToken;
 
     // --- ERC20 Data ---
     string  public constant name     = "Chai";
@@ -82,7 +82,7 @@ contract Chai {
     // keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"));
     bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
 
-    constructor(uint256 chainId_, address vat_, address pot_, address dai_, address join_) public {
+    constructor(uint256 chainId_, address vat_, address pot_, address join_, address dai_) public {
         DOMAIN_SEPARATOR = keccak256(abi.encode(
             keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
             keccak256(bytes(name)),
@@ -93,13 +93,13 @@ contract Chai {
 
         vat = VatLike(vat_);
         pot = PotLike(pot_);
-        dai = GemLike(dai_);
         daiJoin = JoinLike(join_);
+        daiToken = GemLike(dai_);
 
         vat.hope(join_);
         vat.hope(pot_);
 
-        dai.approve(join_, uint(-1));
+        daiToken.approve(join_, uint(-1));
     }
 
     // --- Token ---
@@ -147,6 +147,10 @@ contract Chai {
         emit Approval(holder, spender, can);
     }
 
+    function dai(address usr) external returns (uint wad) {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        wad = rmul(chi, balanceOf[usr]);
+    }
     // wad is denominated in dai
     function join(address dst, uint wad) external {
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
@@ -154,7 +158,7 @@ contract Chai {
         balanceOf[dst] = add(balanceOf[dst], pie);
         totalSupply    = add(totalSupply, pie);
 
-        dai.transferFrom(msg.sender, address(this), wad);
+        daiToken.transferFrom(msg.sender, address(this), wad);
         daiJoin.join(address(this), wad);
         pot.join(pie);
         emit Transfer(address(0), dst, pie);
