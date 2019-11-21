@@ -56,7 +56,7 @@ contract Chai {
     event Transfer(address indexed src, address indexed dst, uint wad);
 
     // --- Math ---
-    uint constant ONE = 10 ** 27;
+    uint constant RAY = 10 ** 27;
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x);
     }
@@ -66,8 +66,11 @@ contract Chai {
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
-    function div(uint x, uint y) internal pure returns (uint z) {
-        z = x / y;
+    function rmul(uint x, uint y) internal pure returns (uint z) {
+        z = mul(x, y) / RAY;
+    }
+    function rdiv(uint x, uint y) internal pure returns (uint z) {
+        z = mul(x, RAY) / y;
     }
 
     // --- EIP712 niceties ---
@@ -139,7 +142,7 @@ contract Chai {
         dai.transferFrom(msg.sender, address(this), wad);
 
         daiJoin.join(address(this), wad);
-        uint pie = div(mul(ONE, wad), pot.chi());
+        uint pie = rdiv(wad, pot.chi());
         pot.join(pie);
 
         balanceOf[dst] = add(balanceOf[dst], pie);
@@ -158,7 +161,8 @@ contract Chai {
         totalSupply    = sub(totalSupply, wad);
 
         pot.exit(wad);
-        daiJoin.exit(msg.sender, div(mul(pot.chi(), wad), ONE));
+        daiJoin.exit(msg.sender, rmul(pot.chi(), wad));
+
         emit Transfer(usr, address(0), wad);
     }
 
