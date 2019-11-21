@@ -9,3 +9,17 @@ _1 Chai = 1 Dai * Pot.chi_
 ## plan
 
 `chai` will be deployed on December 1st, and is published here for review and community feedback. If you have suggestions for improvement, submit an issue or join the discussion at the #dev channel on dapphub.chat
+
+## building and testing
+
+This contract is built using [dapptools](http://dapp.tools/), and follows the standard dapptools procedure for building and testing.
+
+To compile:
+```sh
+$ dapp build
+```
+
+To run the tests:
+```sh
+$ dapp test
+```
