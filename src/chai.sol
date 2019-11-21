@@ -81,10 +81,6 @@ contract Chai {
     bytes32 public DOMAIN_SEPARATOR;
     // keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"));
     bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
-    // keccak256("Join(address usr,uint256 wad,uint256 fee,uint256 nonce,uint256 expiry)"));
-    bytes32 public constant JOIN_TYPEHASH = 0x701f8b62cdcbd2bd6d6bd1865186d960c371ab604e92406ac3d6a22ad8ed0547;
-    // keccak256("Exit(address usr,uint256 wad,uint256 fee,uint256 nonce,uint256 expiry)"));
-    bytes32 public constant EXIT_TYPEHASH = 0xab009dd688ed654007de4a45b77e1314a1efa28c92cfd01f6c132d967f3a27da;
 
     constructor(uint256 chainId_, address vat_, address pot_, address dai_, address join_) public {
         DOMAIN_SEPARATOR = keccak256(abi.encode(
