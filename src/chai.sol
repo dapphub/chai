@@ -138,24 +138,6 @@ contract Chai {
     function join(address dst, uint wad) external {
         join(msg.sender, dst, wad);
     }
-    function join(address usr, uint wad, uint fee, uint nonce, uint expiry, bytes32 r, bytes32 s, uint8 v, address taxman) external {
-         bytes32 digest =
-            keccak256(abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(JOIN_TYPEHASH,
-                                     usr,
-                                     wad,
-                                     fee,
-                                     nonce,
-                                     expiry))
-        ));
-        require(usr == ecrecover(digest, v, r, s), "chai/invalid-permit");
-        require(expiry == 0 || now <= expiry, "chai/permit-expired");
-        require(nonce == nonces[usr]++, "chai/invalid-nonce");
-        join(usr, wad);
-        dai.transferFrom(usr, taxman, fee);
-    }
 
     // wad is denominated in pie
     function exit(address usr, uint wad) public {
@@ -170,25 +152,6 @@ contract Chai {
         pot.exit(wad);
         daiJoin.exit(msg.sender, div(mul(pot.chi(), wad), ONE));
         emit Transfer(usr, address(0), wad);
-    }
-    function exit(address usr, uint wad, uint fee, uint nonce, uint expiry,
-                  bytes32 r, bytes32 s, uint8 v, address taxman)  external {
-         bytes32 digest =
-            keccak256(abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(EXIT_TYPEHASH,
-                                     usr,
-                                     wad,
-                                     fee,
-                                     nonce,
-                                     expiry))
-        ));
-        require(usr == ecrecover(digest, v, r, s), "chai/invalid-permit");
-        require(expiry == 0 || now <= expiry, "chai/permit-expired");
-        require(nonce == nonces[usr]++, "chai/invalid-nonce");
-        exit(usr, wad);
-        dai.transferFrom(usr, taxman, fee);
     }
 
     function permit(address holder, address spender, uint256 nonce, uint256 expiry,
