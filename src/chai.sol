@@ -21,6 +21,7 @@ contract VatLike {
 
 contract PotLike {
     function chi() external returns (uint256);
+    function drip() external returns (uint256);
     function join(uint256) external;
     function exit(uint256) external;
 }
@@ -150,7 +151,7 @@ contract Chai {
 
     // wad is denominated in dai
     function join(address dst, uint wad) external {
-        uint pie = rdiv(wad, pot.chi());
+        uint pie = rdiv(wad, pot.drip());
         balanceOf[dst] = add(balanceOf[dst], pie);
         totalSupply    = add(totalSupply, pie);
 
@@ -170,8 +171,9 @@ contract Chai {
         balanceOf[usr] = sub(balanceOf[usr], wad);
         totalSupply    = sub(totalSupply, wad);
 
+        uint chi = pot.drip();
         pot.exit(wad);
-        daiJoin.exit(msg.sender, rmul(pot.chi(), wad));
+        daiJoin.exit(msg.sender, rmul(chi, wad));
         emit Transfer(usr, address(0), wad);
     }
 }
