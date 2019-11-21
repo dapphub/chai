@@ -137,6 +137,7 @@ contract Chai {
                                  nonce,
                                  expiry,
                                  allowed))));
+        require(holder != address(0), "chai/invalid holder");
         require(holder == ecrecover(digest, v, r, s), "chai/invalid-permit");
         require(expiry == 0 || now <= expiry, "chai/permit-expired");
         require(nonce == nonces[holder]++, "chai/invalid-nonce");
