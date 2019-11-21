@@ -71,9 +71,11 @@ contract Chai {
         require(y == 0 || (z = x * y) / y == x);
     }
     function rmul(uint x, uint y) internal pure returns (uint z) {
+        // always rounds down
         z = mul(x, y) / RAY;
     }
     function rdiv(uint x, uint y) internal pure returns (uint z) {
+        // always rounds down
         z = mul(x, RAY) / y;
     }
 
