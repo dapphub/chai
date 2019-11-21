@@ -135,8 +135,8 @@ contract Chai {
 
     // --- Magic ---
     // wad is denominated in dai
-    function join(address usr, address dst, uint wad) internal {
-        dai.transferFrom(usr, address(this), wad);
+    function join(address dst, uint wad) external {
+        dai.transferFrom(msg.sender, address(this), wad);
 
         daiJoin.join(address(this), wad);
         uint pie = div(mul(ONE, wad), pot.chi());
@@ -145,9 +145,6 @@ contract Chai {
         balanceOf[dst] = add(balanceOf[dst], pie);
         totalSupply    = add(totalSupply, pie);
         emit Transfer(address(0), dst, pie);
-    }
-    function join(address dst, uint wad) external {
-        join(msg.sender, dst, wad);
     }
 
     // wad is denominated in chi * dai
