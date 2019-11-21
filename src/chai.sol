@@ -110,7 +110,6 @@ contract Chai {
 
         vat.hope(join_);
         vat.hope(pot_);
-
     }
 
     // --- Token ---
@@ -136,12 +135,24 @@ contract Chai {
         return true;
     }
 
-    // --- Magic ---
+    // --- Approve by signature ---
+    function permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s) external
+    {
+        bytes32 digest = digest(PERMIT_TYPEHASH, holder, spender, nonce, expiry, allowed);
+        require(holder == ecrecover(digest, v, r, s), "chai/invalid-permit");
+        require(expiry == 0 || now <= expiry, "chai/permit-expired");
+        require(nonce == nonces[holder]++, "chai/invalid-nonce");
+
+        uint can = allowed ? uint(-1) : 0;
+        allowance[holder][spender] = can;
+        emit Approval(holder, spender, can);
+    }
+
     // wad is denominated in dai
     function join(address dst, uint wad) external {
         dai.transferFrom(msg.sender, address(this), wad);
-
         daiJoin.join(address(this), wad);
+
         uint pie = rdiv(wad, pot.chi());
         pot.join(pie);
 
@@ -162,18 +173,6 @@ contract Chai {
 
         pot.exit(wad);
         daiJoin.exit(msg.sender, rmul(pot.chi(), wad));
-
         emit Transfer(usr, address(0), wad);
-    }
-
-    function permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s) external
-    {
-        bytes32 digest = digest(PERMIT_TYPEHASH, holder, spender, nonce, expiry, allowed);
-        require(holder == ecrecover(digest, v, r, s), "chai/invalid-permit");
-        require(expiry == 0 || now <= expiry, "chai/permit-expired");
-        require(nonce == nonces[holder]++, "chai/invalid-nonce");
-        uint can = allowed ? uint(-1) : 0;
-        allowance[holder][spender] = can;
-        emit Approval(holder, spender, can);
     }
 }
