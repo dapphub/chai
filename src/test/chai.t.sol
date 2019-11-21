@@ -74,6 +74,14 @@ contract ChaiSetup {
 contract ChaiTest is DSTest, ChaiSetup {
     Hevm hevm;
 
+    uint constant RAY = 10 ** 27;
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+    function rdiv(uint x, uint y) internal pure returns (uint z) {
+        z = mul(x, RAY) / y;
+    }
+
     function setUp() public {
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(604411200);
@@ -127,6 +135,23 @@ contract ChaiTest is DSTest, ChaiSetup {
         assertEq(chai.dai(address(this)), 10 ether + 1.55 ether);
         chai.exit(address(this), 10 ether);
         assertEq(dai.balanceOf(address(this)), 100 ether + 1.55 ether);
+    }
+    function test_save_rounding_residue() public {
+        pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+        // make chi nasty
+        hevm.warp(now + 1 days);
+
+        chai.join(address(this), 10 ether);
+        assertEq(chai.balanceOf(address(this)), rdiv(10 ether, pot.chi()));
+        // 1 wei lost to rounding
+        assertEq(chai.dai(address(this)), 10 ether - 1);
+
+        hevm.warp(now + 1 days);
+        assertEq(chai.balanceOf(address(this)), rdiv(10 ether, pot.chi()));
+        chai.exit(address(this), rdiv(10 ether, pot.chi()));
+
+        // 1 wei lost to rounding
+        assertEq(dai.balanceOf(address(this)), 100 ether + 0.5 ether - 1);
     }
 }
 
