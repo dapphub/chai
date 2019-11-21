@@ -59,7 +59,7 @@ contract ChaiSetup {
         pot.file("vow", vow);
 
         // set up Chai
-        chai = new Chai(99, address(vat), address(daiJoin), address(pot), address(dai));
+        chai = new Chai(99, address(vat), address(pot), address(dai), address(daiJoin));
 
         // gives this 100 dai to play with
         vat.suck(address(this), address(this), rad(100 ether));

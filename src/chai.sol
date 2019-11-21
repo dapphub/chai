@@ -86,7 +86,7 @@ contract Chai {
     // keccak256("Exit(address usr,uint256 wad,uint256 fee,uint256 nonce,uint256 expiry)"));
     bytes32 public constant EXIT_TYPEHASH = 0xab009dd688ed654007de4a45b77e1314a1efa28c92cfd01f6c132d967f3a27da;
 
-    constructor(uint256 chainId_, address vat_, address join_, address pot_, address dai_) public {
+    constructor(uint256 chainId_, address vat_, address pot_, address dai_, address join_) public {
         DOMAIN_SEPARATOR = keccak256(abi.encode(
             keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
             keccak256(bytes(name)),
@@ -97,8 +97,8 @@ contract Chai {
 
         vat = VatLike(vat_);
         pot = PotLike(pot_);
-        daiJoin = JoinLike(join_);
         dai = GemLike(dai_);
+        daiJoin = JoinLike(join_);
 
         vat.hope(join_);
         vat.hope(pot_);
