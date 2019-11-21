@@ -166,7 +166,7 @@ contract Chai {
         emit Transfer(address(0), dst, pie);
     }
 
-    // wad is denominated in chi * dai
+    // wad is denominated in dai/chi
     function exit(address usr, uint wad) external {
         require(balanceOf[usr] >= wad, "chai/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
