@@ -150,8 +150,8 @@ contract Chai {
         join(msg.sender, dst, wad);
     }
 
-    // wad is denominated in pie
-    function exit(address usr, uint wad) public {
+    // wad is denominated in chi * dai
+    function exit(address usr, uint wad) external {
         require(balanceOf[usr] >= wad, "chai/insufficient-balance");
         if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
             require(allowance[usr][msg.sender] >= wad, "chai/insufficient-allowance");
