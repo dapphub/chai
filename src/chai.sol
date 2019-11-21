@@ -45,7 +45,7 @@ contract Chai {
     string  public constant name     = "Chai";
     string  public constant symbol   = "CHAI";
     string  public constant version  = "1";
-    uint8   public constant decimals = 45;
+    uint8   public constant decimals = 18;
     uint256 public totalSupply;
 
     mapping (address => uint)                      public balanceOf;
