@@ -1,4 +1,5 @@
-// Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico, lucasvo
+// chai.sol -- a dai savings token
+// Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico, lucasvo, livnev
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
