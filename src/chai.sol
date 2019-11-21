@@ -33,6 +33,7 @@ contract JoinLike {
 
 contract GemLike {
     function transferFrom(address,address,uint) external returns (bool);
+    function approve(address,uint) external returns (bool);
 }
 
 contract Chai {
@@ -111,6 +112,8 @@ contract Chai {
 
         vat.hope(join_);
         vat.hope(pot_);
+
+        dai.approve(join_, uint(-1));
     }
 
     // --- Token ---
