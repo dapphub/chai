@@ -122,18 +122,6 @@ contract Chai {
         return true;
     }
 
-    // --- Alias ---
-    function push(address usr, uint wad) external {
-        transferFrom(msg.sender, usr, wad);
-    }
-    function pull(address usr, uint wad) external {
-        transferFrom(usr, msg.sender, wad);
-    }
-    function move(address src, address dst, uint wad) external {
-        transferFrom(src, dst, wad);
-    }
-
-
     // --- Magic ---
     // wad is denominated in dai
     function join(address usr, address dst, uint wad) internal {
