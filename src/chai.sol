@@ -79,6 +79,17 @@ contract Chai {
     // keccak256("Exit(address usr,uint256 wad,uint256 fee,uint256 nonce,uint256 expiry)"));
     bytes32 public constant EXIT_TYPEHASH = 0xab009dd688ed654007de4a45b77e1314a1efa28c92cfd01f6c132d967f3a27da;
 
+    function digest(bytes32 hash, address holder, address spender, uint nonce, uint expiry, bool allowed) internal returns (bytes32) {
+         return keccak256(abi.encodePacked(
+             "\x19\x01",
+             DOMAIN_SEPARATOR,
+             keccak256(abi.encode(hash,
+                                  holder,
+                                  spender,
+                                  nonce,
+                                  expiry,
+                                  allowed))));
+    }
 
     constructor(uint256 chainId_, address vat_, address join_, address pot_, address dai_) public {
         DOMAIN_SEPARATOR = keccak256(abi.encode(
@@ -154,25 +165,14 @@ contract Chai {
         emit Transfer(usr, address(0), wad);
     }
 
-    function permit(address holder, address spender, uint256 nonce, uint256 expiry,
-                    bool allowed, uint8 v, bytes32 r, bytes32 s) external
+    function permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s) external
     {
-        bytes32 digest =
-            keccak256(abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(PERMIT_TYPEHASH,
-                                     holder,
-                                     spender,
-                                     nonce,
-                                     expiry,
-                                     allowed))
-        ));
+        bytes32 digest = digest(PERMIT_TYPEHASH, holder, spender, nonce, expiry, allowed);
         require(holder == ecrecover(digest, v, r, s), "chai/invalid-permit");
         require(expiry == 0 || now <= expiry, "chai/permit-expired");
         require(nonce == nonces[holder]++, "chai/invalid-nonce");
-        uint wad = allowed ? uint(-1) : 0;
-        allowance[holder][spender] = wad;
-        emit Approval(holder, spender, wad);
+        uint can = allowed ? uint(-1) : 0;
+        allowance[holder][spender] = can;
+        emit Approval(holder, spender, can);
     }
 }
