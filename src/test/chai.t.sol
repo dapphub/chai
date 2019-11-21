@@ -22,7 +22,7 @@ import "ds-test/test.sol";
 import "../chai.sol";
 
 contract TokenUser {
-    Chai  token;
+    Chai token;
 
     constructor(Chai token_) public {
         token = token_;
@@ -67,19 +67,6 @@ contract TokenUser {
     {
         return token.approve(guy, uint(-1));
     }
-    function doMint(uint wad) public {
-        token.mint(address(this), wad);
-    }
-    function doBurn(uint wad) public {
-        token.burn(address(this), wad);
-    }
-    function doMint(address guy, uint wad) public {
-        token.mint(guy, wad);
-    }
-    function doBurn(address guy, uint wad) public {
-        token.burn(guy, wad);
-    }
-
 }
 
 contract Hevm {
@@ -191,55 +178,6 @@ contract ChaiTest is DSTest {
         // to yourself
         token.transferFrom(self, self, token.balanceOf(self) + 1);
     }
-    function testMintself() public {
-        uint mintAmount = 10;
-        token.mint(address(this), mintAmount);
-        assertEq(token.balanceOf(self), initialBalanceThis + mintAmount);
-    }
-    function testMintGuy() public {
-        uint mintAmount = 10;
-        token.mint(user1, mintAmount);
-        assertEq(token.balanceOf(user1), mintAmount);
-    }
-    function testFailMintGuyNoAuth() public {
-        TokenUser(user1).doMint(user2, 10);
-    }
-    function testMintGuyAuth() public {
-        token.rely(user1);
-        TokenUser(user1).doMint(user2, 10);
-    }
-
-    function testBurn() public {
-        uint burnAmount = 10;
-        token.burn(address(this), burnAmount);
-        assertEq(token.totalSupply(), initialBalanceThis + initialBalanceCal - burnAmount);
-    }
-    function testBurnself() public {
-        uint burnAmount = 10;
-        token.burn(address(this), burnAmount);
-        assertEq(token.balanceOf(self), initialBalanceThis - burnAmount);
-    }
-    function testBurnGuyWithTrust() public {
-        uint burnAmount = 10;
-        token.transfer(user1, burnAmount);
-        assertEq(token.balanceOf(user1), burnAmount);
-
-        TokenUser(user1).doApprove(self);
-        token.burn(user1, burnAmount);
-        assertEq(token.balanceOf(user1), 0);
-    }
-    function testBurnAuth() public {
-        token.transfer(user1, 10);
-        token.rely(user1);
-        TokenUser(user1).doBurn(10);
-    }
-    function testBurnGuyAuth() public {
-        token.transfer(user2, 10);
-        //        token.rely(user1);
-        TokenUser(user2).doApprove(user1);
-        TokenUser(user1).doBurn(user2, 10);
-    }
-
     function testFailUntrustedTransferFrom() public {
         assertEq(token.allowance(self, user2), 0);
         TokenUser(user1).doTransferFrom(self, user2, 200);
