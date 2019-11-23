@@ -14,36 +14,19 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.5.0;
+pragma solidity 0.5.12;
 
-contract VatLike {
-    function hope(address) external;
-}
-
-contract PotLike {
-    function chi() external returns (uint256);
-    function rho() external returns (uint256);
-    function drip() external returns (uint256);
-    function join(uint256) external;
-    function exit(uint256) external;
-}
-
-contract JoinLike {
-    function join(address, uint) external;
-    function exit(address, uint) external;
-}
-
-contract GemLike {
-    function transferFrom(address,address,uint) external returns (bool);
-    function approve(address,uint) external returns (bool);
-}
+import {Vat} from "dss/vat.sol";
+import {Pot} from "dss/pot.sol";
+import {Dai} from "dss/dai.sol";
+import {DaiJoin} from "dss/join.sol";
 
 contract Chai {
     // --- Data ---
-    VatLike  public vat;
-    PotLike  public pot;
-    JoinLike public daiJoin;
-    GemLike  public daiToken;
+    Vat  public vat;
+    Pot  public pot;
+    Dai  public daiToken;
+    DaiJoin public daiJoin;
 
     // --- ERC20 Data ---
     string  public constant name     = "Chai";
@@ -97,10 +80,10 @@ contract Chai {
             address(this)
         ));
 
-        vat      = VatLike(vat_);
-        pot      = PotLike(pot_);
-        daiJoin  = JoinLike(join_);
-        daiToken = GemLike(dai_);
+        vat      = Vat(vat_);
+        pot      = Pot(pot_);
+        daiJoin  = DaiJoin(join_);
+        daiToken = Dai(dai_);
 
         vat.hope(join_);
         vat.hope(pot_);
