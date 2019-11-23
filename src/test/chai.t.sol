@@ -163,12 +163,38 @@ contract ChaiTest is DSTest, ChaiSetup {
 
         chai.move(address(this), address(0xcafebabe), 0.5 ether);
 
-        assertEq(chai.dai(address(this)), 10 ether);
-        // cafebabe got one less than expected because of rounding :(
-        assertEq(chai.dai(address(0xcafebabe)), 0.5 ether - 1);
+        // we sent one more than requested because of rounding
+        assertEq(chai.dai(address(this)), 10 ether - 1);
+        // cafebabe got no less than requested
+        assertEq(chai.dai(address(0xcafebabe)), 0.5 ether);
 
         chai.exit(address(this), chai.balanceOf(address(this)));
-        assertEq(dai.balanceOf(address(this)), 100 ether);
+        assertEq(dai.balanceOf(address(this)), 100 ether - 1);
+    }
+    function test_move_receive_extra() public {
+        pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+        // make chi nasty
+        hevm.warp(now + 100 days);
+        chai.join(address(this), 10 ether);
+        uint chaiBal = rdiv(10 ether, pot.chi());
+        assertEq(chai.balanceOf(address(this)), chaiBal);
+        // 18 wei lost to rounding
+        assertEq(chai.dai(address(this)), 10 ether - 17);
+
+        hevm.warp(now + 1 days);
+        assertEq(chai.balanceOf(address(this)), chaiBal);
+        // 1 more wei lost to rounding
+        assertEq(chai.dai(address(this)), 10 ether + 0.5 ether - 17 - 1);
+
+        chai.move(address(this), address(0xcafebabe), 0.5 ether);
+
+        // we sent 26 wei more than requested because of rounding
+        assertEq(chai.dai(address(this)), 10 ether - 17 - 1 - 26);
+        // cafebabe got no less than requested
+        assertEq(chai.dai(address(0xcafebabe)), 0.5 ether + 25);
+
+        chai.exit(address(this), chai.balanceOf(address(this)));
+        assertEq(dai.balanceOf(address(this)), 100 ether - 17 - 1 - 26);
     }
 }
 

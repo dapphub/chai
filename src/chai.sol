@@ -78,6 +78,10 @@ contract Chai {
         // always rounds down
         z = mul(x, RAY) / y;
     }
+    function rdivup(uint x, uint y) internal pure returns (uint z) {
+        // always rounds up
+        z = add(mul(x, RAY), sub(y, 1)) / y;
+    }
 
     // --- EIP712 niceties ---
     bytes32 public DOMAIN_SEPARATOR;
@@ -111,7 +115,8 @@ contract Chai {
     // like transferFrom but dai-denominated
     function move(address src, address dst, uint wad) external returns (bool) {
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
-        return transferFrom(src, dst, rdiv(wad, chi));
+        // rounding up ensures dst gets at least wad dai
+        return transferFrom(src, dst, rdivup(wad, chi));
     }
     function transferFrom(address src, address dst, uint wad)
         public returns (bool)
