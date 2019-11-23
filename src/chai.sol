@@ -78,6 +78,10 @@ contract Chai {
         // always rounds down
         z = mul(x, RAY) / y;
     }
+    function rdivup(uint x, uint y) internal pure returns (uint z) {
+        // always rounds up
+        z = add(mul(x, RAY), sub(y, 1)) / y;
+    }
 
     // --- EIP712 niceties ---
     bytes32 public DOMAIN_SEPARATOR;
@@ -107,6 +111,12 @@ contract Chai {
     // --- Token ---
     function transfer(address dst, uint wad) external returns (bool) {
         return transferFrom(msg.sender, dst, wad);
+    }
+    // like transferFrom but dai-denominated
+    function move(address src, address dst, uint wad) external returns (bool) {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        // rounding up ensures dst gets at least wad dai
+        return transferFrom(src, dst, rdivup(wad, chi));
     }
     function transferFrom(address src, address dst, uint wad)
         public returns (bool)
@@ -167,18 +177,25 @@ contract Chai {
     }
 
     // wad is denominated in (1/chi) * dai
-    function exit(address usr, uint wad) external {
-        require(balanceOf[usr] >= wad, "chai/insufficient-balance");
-        if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
-            require(allowance[usr][msg.sender] >= wad, "chai/insufficient-allowance");
-            allowance[usr][msg.sender] = sub(allowance[usr][msg.sender], wad);
+    function exit(address src, uint wad) public {
+        require(balanceOf[src] >= wad, "chai/insufficient-balance");
+        if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
+            require(allowance[src][msg.sender] >= wad, "chai/insufficient-allowance");
+            allowance[src][msg.sender] = sub(allowance[src][msg.sender], wad);
         }
-        balanceOf[usr] = sub(balanceOf[usr], wad);
+        balanceOf[src] = sub(balanceOf[src], wad);
         totalSupply    = sub(totalSupply, wad);
 
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
         pot.exit(wad);
         daiJoin.exit(msg.sender, rmul(chi, wad));
-        emit Transfer(usr, address(0), wad);
+        emit Transfer(src, address(0), wad);
+    }
+
+    // wad is denominated in dai
+    function draw(address src, uint wad) external {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        // rounding up ensures usr gets at least wad dai
+        exit(src, rdivup(wad, chi));
     }
 }
