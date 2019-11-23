@@ -197,6 +197,8 @@ contract ChaiTest is DSTest, ChaiSetup {
         assertEq(chai.dai(address(this)), 10 ether - 17 - 1 - 26);
         // cafebabe got no less than requested
         assertEq(chai.dai(address(0xcafebabe)), 0.5 ether + 25);
+        // chai is globally conserved
+        assertEq(chai.balanceOf(address(this)) + chai.balanceOf(address(0xcafebabe)), chaiBal);
 
         chai.exit(address(this), chai.balanceOf(address(this)));
         assertEq(dai.balanceOf(address(this)), 100 ether - 17 - 1 - 26);
