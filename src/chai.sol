@@ -191,4 +191,11 @@ contract Chai {
         daiJoin.exit(msg.sender, rmul(chi, wad));
         emit Transfer(src, address(0), wad);
     }
+
+    // wad is denominated in dai
+    function draw(address src, uint wad) external {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        // rounding up ensures usr gets at least wad dai
+        exit(src, rdivup(wad, chi));
+    }
 }

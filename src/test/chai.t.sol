@@ -196,6 +196,29 @@ contract ChaiTest is DSTest, ChaiSetup {
         chai.exit(address(this), chai.balanceOf(address(this)));
         assertEq(dai.balanceOf(address(this)), 100 ether - 17 - 1 - 26);
     }
+    function test_draw() public {
+        pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+        // make chi nasty
+        hevm.warp(now + 100 days);
+
+        chai.join(address(this), 10 ether);
+        uint chaiBal = rdiv(10 ether, pot.chi());
+        assertEq(chai.balanceOf(address(this)), chaiBal);
+        // 17 wei less due to rounding
+        assertEq(chai.dai(address(this)), 10 ether - 17);
+
+        hevm.warp(now + 1 days);
+        assertEq(chai.balanceOf(address(this)), chaiBal);
+        // 1 wei less due to rounding
+        assertEq(chai.dai(address(this)), 10 ether + 0.5 ether - 18);
+        chai.draw(address(this), 10 ether);
+        // withdrew 94 wei extra due to rounding
+        assertEq(dai.balanceOf(address(this)), 100 ether + 94);
+
+        chai.exit(address(this), chai.balanceOf(address(this)));
+        // 1 wei less due to rounding
+        assertEq(dai.balanceOf(address(this)), 100 ether + 0.5 ether - 18 - 1);
+    }
 }
 
 contract ChaiUser {
