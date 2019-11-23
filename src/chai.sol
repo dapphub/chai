@@ -177,18 +177,18 @@ contract Chai {
     }
 
     // wad is denominated in (1/chi) * dai
-    function exit(address usr, uint wad) external {
-        require(balanceOf[usr] >= wad, "chai/insufficient-balance");
-        if (usr != msg.sender && allowance[usr][msg.sender] != uint(-1)) {
-            require(allowance[usr][msg.sender] >= wad, "chai/insufficient-allowance");
-            allowance[usr][msg.sender] = sub(allowance[usr][msg.sender], wad);
+    function exit(address src, uint wad) public {
+        require(balanceOf[src] >= wad, "chai/insufficient-balance");
+        if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
+            require(allowance[src][msg.sender] >= wad, "chai/insufficient-allowance");
+            allowance[src][msg.sender] = sub(allowance[src][msg.sender], wad);
         }
-        balanceOf[usr] = sub(balanceOf[usr], wad);
+        balanceOf[src] = sub(balanceOf[src], wad);
         totalSupply    = sub(totalSupply, wad);
 
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
         pot.exit(wad);
         daiJoin.exit(msg.sender, rmul(chi, wad));
-        emit Transfer(usr, address(0), wad);
+        emit Transfer(src, address(0), wad);
     }
 }
