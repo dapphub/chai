@@ -146,7 +146,7 @@ contract ChaiTest is DSTest, ChaiSetup {
         chai.join(address(this), 10 ether);
         uint chaiBal = rdiv(10 ether, pot.chi());
         assertEq(chai.balanceOf(address(this)), chaiBal);
-        // 1 wei lost to rounding
+        // 1 wei less due to rounding
         assertEq(chai.dai(address(this)), 10 ether - 1);
 
         hevm.warp(now + 1 days);
