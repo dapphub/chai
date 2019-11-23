@@ -108,6 +108,11 @@ contract Chai {
     function transfer(address dst, uint wad) external returns (bool) {
         return transferFrom(msg.sender, dst, wad);
     }
+    // like transferFrom but dai-denominated
+    function move(address src, address dst, uint wad) external returns (bool) {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        return transferFrom(src, dst, rdiv(wad, chi));
+    }
     function transferFrom(address src, address dst, uint wad)
         public returns (bool)
     {
