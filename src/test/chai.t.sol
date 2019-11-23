@@ -108,9 +108,11 @@ contract ChaiTest is DSTest, ChaiSetup {
 
     function test_save_1d() public {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+
         chai.join(address(this), 10 ether);
         assertEq(chai.balanceOf(address(this)), 10 ether);
         assertEq(chai.dai(address(this)), 10 ether);
+
         hevm.warp(now + 1 days);
         assertEq(chai.balanceOf(address(this)), 10 ether);
         assertEq(chai.dai(address(this)), 10 ether + 0.5 ether);
@@ -120,6 +122,7 @@ contract ChaiTest is DSTest, ChaiSetup {
 
     function test_save_2d() public {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+
         chai.join(address(this), 10 ether);
         assertEq(chai.balanceOf(address(this)), 10 ether);
         hevm.warp(now + 1 days);
@@ -154,6 +157,7 @@ contract ChaiTest is DSTest, ChaiSetup {
     }
     function test_move() public {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
+
         chai.join(address(this), 10 ether);
         assertEq(chai.balanceOf(address(this)), 10 ether);
         assertEq(chai.dai(address(this)), 10 ether);
@@ -175,15 +179,16 @@ contract ChaiTest is DSTest, ChaiSetup {
         pot.file("dsr", uint(1000000564701133626865910626));  // 5% / day
         // make chi nasty
         hevm.warp(now + 100 days);
+
         chai.join(address(this), 10 ether);
         uint chaiBal = rdiv(10 ether, pot.chi());
         assertEq(chai.balanceOf(address(this)), chaiBal);
-        // 18 wei lost to rounding
+        // 17 wei less due to rounding
         assertEq(chai.dai(address(this)), 10 ether - 17);
 
         hevm.warp(now + 1 days);
         assertEq(chai.balanceOf(address(this)), chaiBal);
-        // 1 more wei lost to rounding
+        // 1 wei less due to rounding
         assertEq(chai.dai(address(this)), 10 ether + 0.5 ether - 17 - 1);
 
         chai.move(address(this), address(0xcafebabe), 0.5 ether);
