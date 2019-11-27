@@ -3,27 +3,20 @@
 BIN_DIR=${BIN_DIR:-$(cd "${0%/*}"&&pwd)}
 source $BIN_DIR/lib/load-addresses
 
-loadAddresses $MCD_CONFIG 
 
 ADDRESS_DIR=${ADDRESS_DIR:-$PWD/addresses}
-mkdir -p $ADDRESS_DIR 
+mkdir -p $ADDRESS_DIR
 
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
 
+test -z "$CHAIN_ID" && echo "Please set CHAIN_ID" && exit
+test -z "$MCD_VAT" && echo "Please set MCD_VAT" && exit
+test -z "$MCD_POT" && echo "Please set MCD_POT" && exit
+test -z "$MCD_JOIN" && echo "Please set MCD_JOIN" && exit
+test -z "$MCD_DAI" && echo "Please set MCD_DAI" && exit
 
 set -ex
-test -z "$SKIP_BUILD" && dapp build
-
-DEPLOYER=$(dapp create Deploy $MCD_VAT $MCD_DAI $MCD_JOIN_DAI $MCD_POT 1)
-
-touch "$ADDRESS_DIR/addresses-$(seth chain).json"
-addAddresses "$ADDRESS_DIR/addresses-$(seth chain).json" <<EOF
-{
-    "DEPLOYER": "$DEPLOYER",
-    "CHAI": "$(seth call $DEPLOYER "chai()(address)")",
-    "DEALER": "$(seth call $DEPLOYER "dealer()(address)")", 
-    "JOIN_CHAI": "$(seth call $DEPLOYER "joinc()(address)")" 
-}
-EOF
+test -z "$SKIP_BUILD" && dapp build --extract
+dapp create Chai $CHAIN_ID $MCD_VAT $MCD_POT $MCD_JOIN $MCD_DAI
