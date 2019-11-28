@@ -40,10 +40,10 @@ contract GemLike {
 
 contract Chai {
     // --- Data ---
-    Vat  public constant vat = Vat(0xbA987bDB501d131f766fEe8180Da5d81b34b69d9);
-    Pot  public constant pot = Pot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
-    Dai  public constant daiToken = Dai(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
-    DaiJoin public constant daiJoin = DaiJoin(0x5AA71a3ae1C0bd6ac27A1f28e1415fFFB6F15B8c);
+    VatLike  public constant vat = VatLike(0xbA987bDB501d131f766fEe8180Da5d81b34b69d9);
+    PotLike  public constant pot = PotLike(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
+    JoinLike public constant daiJoin = JoinLike(0x5AA71a3ae1C0bd6ac27A1f28e1415fFFB6F15B8c);
+    GemLike  public constant daiToken = GemLike(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
     // --- ERC20 Data ---
     string  public constant name     = "Chai";
@@ -84,21 +84,20 @@ contract Chai {
     }
 
     // --- EIP712 niceties ---
-    /*
-    keccak256(abi.encode(
-            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-            keccak256(bytes(name)),
-            keccak256(bytes(version)),
-            42,
-            address(this)
-            ));
-    */
     bytes32 public constant DOMAIN_SEPARATOR = 0xf90cd82b645bd62f4ef064e50ba1a599276e7a670a7ade654a8abaadb2df6f7c;
 
     // keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"));
     bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
 
     constructor() public {
+      assert(DOMAIN_SEPARATOR == keccak256(abi.encode(
+                                   keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                                   keccak256(bytes(name)),
+                                   keccak256(bytes(version)),
+                                   42,
+                                   address(this)
+                                                      )));
+
         vat.hope(0x2D6B98058E84Dcb8b57fb8C79613bD858af65975);
         vat.hope(0xc351B89C286288B9201835f78dbbccaDA357671e);
 
