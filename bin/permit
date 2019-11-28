@@ -6,8 +6,8 @@ display_usage() {
 #Domain separator data
 VERSION='1'
 NAME="Chai"
-CHAIN_ID=99
-ADDRESS=0xd122f8f92737fc00fb3d62d4ed9244d393663870
+CHAIN_ID=1
+ADDRESS=0x06af07097c9eeb7fd685c692751d5c66db49c215
 
 
 DOMAIN_SEPARATOR=$(seth keccak \
