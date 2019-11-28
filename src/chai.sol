@@ -97,10 +97,10 @@ contract Chai {
             address(this))
         ));
 
-        vat.hope(join_);
-        vat.hope(pot_);
+        vat.hope(address(daiJoin));
+        vat.hope(address(pot));
 
-        daiToken.approve(join_, uint(-1));
+        daiToken.approve(address(daiJoin), uint(-1));
     }
 
     // --- Token ---
