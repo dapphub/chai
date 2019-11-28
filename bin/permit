@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 display_usage() {
   echo "Usage: <spender> <nonce> <allowed> [expiry]"
 }

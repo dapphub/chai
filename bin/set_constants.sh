@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 display_usage() {
   echo "Usage: ./set_constants.sh {mainnet|kovan|hevm}"
