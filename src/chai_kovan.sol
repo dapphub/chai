@@ -38,7 +38,7 @@ contract GemLike {
     function approve(address,uint) external returns (bool);
 }
 
-contract Chai {
+contract ChaiKovan {
     // --- Data ---
     VatLike  public constant vat = VatLike(0xbA987bDB501d131f766fEe8180Da5d81b34b69d9);
     PotLike  public constant pot = PotLike(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
