@@ -1,4 +1,7 @@
 all    :; dapp build
 clean  :; dapp clean
-test   :; ./bin/set_constants.sh hevm && dapp test && ./bin/set_constants.sh mainnet
-deploy :; dapp create Sdai
+deploy :; dapp create Chai
+test:
+	NETWORK=hevm ./bin/set_constants
+	dapp test || NETWORK=mainnet ./bin/set_constants
+	NETWORK=mainnet ./bin/set_constants

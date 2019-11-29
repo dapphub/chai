@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+display_usage() {
+  echo "Usage: NETWORK={mainnet|kovan|hevm} set_constants"
+}
+
+export NETWORK=${NETWORK:-mainnet}
+
+# shellcheck source=conf.sh
+source "${0%/*}/conf.sh"
+DOMAIN_SEPARATOR=$("${0%/*}/domain_separator" "$1")
+sed -i -e "s/DOMAIN_SEPARATOR = .*;/DOMAIN_SEPARATOR = $DOMAIN_SEPARATOR;/g" ./src/chai.sol
+sed -i -e "s/VatLike(.*);/VatLike($VAT);/g"    ./src/chai.sol
+sed -i -e "s/PotLike(.*);/PotLike($POT);/g"    ./src/chai.sol
+sed -i -e "s/JoinLike(.*);/JoinLike($JOIN);/g" ./src/chai.sol
+sed -i -e "s/GemLike(.*);/GemLike($DAI);/g"    ./src/chai.sol
+sed -i -e "s/GemLike(.*);/GemLike($DAI);/g"    ./src/chai.sol
+sed -i -e "s/bytes(version)), .*,/bytes(version)), $CHAIN_ID,/g" ./src/chai.sol
