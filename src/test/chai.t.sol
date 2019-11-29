@@ -58,7 +58,7 @@ contract ChaiSetup {
         pot.file("vow", vow);
 
         // set up Chai
-        chai = new Chai(99, address(vat), address(pot), address(daiJoin), address(dai));
+        chai = new Chai();
 
         // gives this 100 dai to play with
         vat.suck(address(this), address(this), rad(100 ether));
@@ -89,6 +89,26 @@ contract ChaiTest is DSTest, ChaiSetup {
 
     function test_initial_balance() public {
         assertEq(dai.balanceOf(address(this)), 100 ether);
+    }
+
+    function test_vat() public {
+      assertEq(address(chai.vat()), address(vat));
+    }
+
+    function test_pot() public {
+      assertEq(address(chai.pot()), address(pot));
+    }
+
+    function test_daiJoin() public {
+      assertEq(address(chai.daiJoin()), address(daiJoin));
+    }
+
+    function test_dai() public {
+      assertEq(address(chai.daiToken()), address(dai));
+    }
+
+    function test_chai() public {
+      assertEq(address(chai), address(0xd122F8f92737FC00Fb3d62d4eD9244D393663870));
     }
 
     function test_join_then_exit() public {

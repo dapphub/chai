@@ -1,27 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 display_usage() {
-  echo "Usage: <spender> <nonce> <allowed> [expiry]"
+  echo "Usage: permit <spender> <nonce> <allowed> [expiry]"
 }
 
-#Domain separator data
-VERSION='1'
-NAME="Chai"
-CHAIN_ID=99
-ADDRESS=0xd122f8f92737fc00fb3d62d4ed9244d393663870
+if [ $# -lt 3 ];  then
+    display_usage
+    exit 1
+fi
 
+if [ -z ${ETH_FROM+x} ]; then
+    echo "ETH_FROM must be set";
+    exit 1
+fi
 
-DOMAIN_SEPARATOR=$(seth keccak \
-     $(seth keccak $(seth --from-ascii "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"))\
-$(echo $(seth keccak $(seth --from-ascii "$NAME"))\
-$(seth keccak $(seth --from-ascii $VERSION))$(seth --to-uint256 $CHAIN_ID)\
-$(seth --to-uint256 $ADDRESS) | sed 's/0x//g'))
-#echo $DOMAIN_SEPARATOR
+export NETWORK=${NETWORK:-mainnet}
+# shellcheck source=conf.sh
+source "${0%/*}/conf.sh"
+DOMAIN_SEPARATOR=$("${0%/*}/domain_separator")
 
-#Permit type data
+# permit type data
 permit_TYPEHASH=$(seth keccak $(seth --from-ascii "Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"))
-#echo $permit_TYPEHASH
 
-#permit data
+# permit data
 HOLDER=$ETH_FROM
 SPENDER=$1
 NONCE=$2
@@ -34,10 +35,6 @@ echo "SPENDER $SPENDER"
 echo "NONCE $NONCE"
 echo "ALLOWED $ALLOWED"
 echo "DEADLINE $DEADLINE"
-echo "domain separator:"
-echo $DOMAIN_SEPARATOR
-echo $permit_TYPEHASH
-
 echo "Enter passphrase for $ETH_FROM"
 
 MESSAGE=0x1901\
@@ -51,8 +48,6 @@ $(seth --to-uint256 $DEADLINE)\
 $(seth --to-uint256 $ALLOWED)\
       | sed 's/0x//g')) \
       | sed 's/0x//g')
-#echo "MESSAGE" $MESSAGE
 SIG=$(ethsign msg --no-prefix --data $MESSAGE)
-#echo $SIG
-##JSON output
+
 printf '{"permit": {"holder":"%s","spender":"%s","nonce":"%s", "expiry": "%s", "allowed": "%s", "v": "%s", "r": "%s", "s": "%s"}}\n' "$HOLDER" "$SPENDER" "$NONCE" "$DEADLINE" "$ALLOWED" $((0x$(echo "$SIG" | cut -c 131-132))) $(echo "$SIG" | cut -c 1-66) "0x"$(echo "$SIG" | cut -c 67-130)

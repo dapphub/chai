@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity >=0.5.0;
+pragma solidity 0.5.12;
 
 contract VatLike {
     function hope(address) external;
@@ -40,10 +40,10 @@ contract GemLike {
 
 contract Chai {
     // --- Data ---
-    VatLike  public vat;
-    PotLike  public pot;
-    JoinLike public daiJoin;
-    GemLike  public daiToken;
+    VatLike  public vat = VatLike(0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B);
+    PotLike  public pot = PotLike(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    JoinLike public daiJoin = JoinLike(0x9759A6Ac90977b93B58547b4A71c78317f391A28);
+    GemLike  public daiToken = GemLike(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
     // --- ERC20 Data ---
     string  public constant name     = "Chai";
@@ -84,28 +84,21 @@ contract Chai {
     }
 
     // --- EIP712 niceties ---
-    bytes32 public DOMAIN_SEPARATOR;
+    bytes32 public constant DOMAIN_SEPARATOR = 0x0b50407de9fa158c2cba01a99633329490dfd22989a150c20e8c7b4c1fb0fcc3;
     // keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"));
-    bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
+    bytes32 public constant PERMIT_TYPEHASH  = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
 
-    constructor(uint256 chainId_, address vat_, address pot_, address join_, address dai_) public {
-        DOMAIN_SEPARATOR = keccak256(abi.encode(
+    constructor() public {
+        assert (DOMAIN_SEPARATOR ==
+          keccak256(abi.encode(
             keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-            keccak256(bytes(name)),
-            keccak256(bytes(version)),
-            chainId_,
-            address(this)
-        ));
+            keccak256(bytes(name)), keccak256(bytes(version)), 1, address(this)))
+        );
 
-        vat      = VatLike(vat_);
-        pot      = PotLike(pot_);
-        daiJoin  = JoinLike(join_);
-        daiToken = GemLike(dai_);
+        vat.hope(address(daiJoin));
+        vat.hope(address(pot));
 
-        vat.hope(join_);
-        vat.hope(pot_);
-
-        daiToken.approve(join_, uint(-1));
+        daiToken.approve(address(daiJoin), uint(-1));
     }
 
     // --- Token ---
