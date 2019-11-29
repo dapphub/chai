@@ -1,7 +1,17 @@
-#!/usr/bin/env bash
+#!/bin/bash
 display_usage() {
   echo "Usage: <spender> <nonce> <allowed> [expiry]"
 }
+
+if [ $# -lt 3 ];  then
+    disply_usage
+    exit 1
+fi
+
+if [ -z ${ETH_FROM+x} ]; then
+    echo "ETH_FROM must be set";
+    exit 1
+fi
 
 #Domain separator data
 VERSION='1'
@@ -34,9 +44,9 @@ echo "SPENDER $SPENDER"
 echo "NONCE $NONCE"
 echo "ALLOWED $ALLOWED"
 echo "DEADLINE $DEADLINE"
-echo "domain separator:"
-echo $DOMAIN_SEPARATOR
-echo $permit_TYPEHASH
+#echo "domain separator:"
+#echo $DOMAIN_SEPARATOR
+#echo $permit_TYPEHASH
 
 echo "Enter passphrase for $ETH_FROM"
 
