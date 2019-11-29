@@ -14,6 +14,7 @@ if [ -z ${ETH_FROM+x} ]; then
     exit 1
 fi
 
+export NETWORK=${NETWORK:-mainnet}
 # shellcheck source=conf.sh
 source "${0%/*}/conf.sh"
 DOMAIN_SEPARATOR=$("${0%/*}/domain_separator.sh" "$1")

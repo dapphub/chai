@@ -6,7 +6,6 @@ display_usage() {
 }
 
 export NETWORK=${NETWORK:-mainnet}
-
 # shellcheck source=conf.sh
 source "${0%/*}/conf.sh"
 DOMAIN_SEPARATOR=$("${0%/*}/domain_separator" "$1")
