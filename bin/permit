@@ -17,7 +17,7 @@ fi
 export NETWORK=${NETWORK:-mainnet}
 # shellcheck source=conf.sh
 source "${0%/*}/conf.sh"
-DOMAIN_SEPARATOR=$("${0%/*}/domain_separator.sh" "$1")
+DOMAIN_SEPARATOR=$("${0%/*}/domain_separator")
 
 # permit type data
 permit_TYPEHASH=$(seth keccak $(seth --from-ascii "Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)"))
