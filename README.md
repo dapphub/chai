@@ -16,7 +16,7 @@ This contract is built using [dapptools](http://dapp.tools/), and follows the st
 
 To compile:
 ```sh
-$ make build
+$ make all
 ```
 
 To run the tests:
