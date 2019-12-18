@@ -6,9 +6,11 @@ _1 Chai = 1 Dai * Pot.chi_
 
 `chai` is a very simple contract. Apart from the standard ERC20 functionality, it also implements the same `permit` off-chain approval as `dai` itself. You can also call `dai(address usr)` to check how many `dai` a given user's `chai` balance claims. The token has no owner or authority. That's all there is to it.
 
-## plan
+## mainnet deployment
 
-`chai` will be deployed on December 1st, and is published here for review and community feedback. If you have suggestions for improvement, submit an issue or join the discussion at the #dev channel on dapphub.chat
+`chai` is live on the mainnet since December 1st at [0x06af07097c9eeb7fd685c692751d5c66db49c215](https://etherscan.io/token/0x06af07097c9eeb7fd685c692751d5c66db49c215)
+
+You can interact with the Chai contract at [chai.money](https://chai.money). The source for the ui is hosted [here](https://github.com/lucasvo/chui).
 
 ## building and testing
 
