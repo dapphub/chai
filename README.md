@@ -12,6 +12,11 @@ _1 Chai = 1 Dai * Pot.chi_
 
 You can interact with the Chai contract at [chai.money](https://chai.money). The source for the ui is hosted [here](https://github.com/lucasvo/chui).
 
+## audit
+
+The deployed `chai` contract underwent a two day audit by Trail Of Bits in the beginning of February, finding no security related issues.
+A summary can be found [here](./ToB_Letter_of_Attestation_Chai.pdf).
+
 ## building and testing
 
 This contract is built using [dapptools](http://dapp.tools/), and follows the standard dapptools procedure for building and testing.
@@ -30,7 +35,9 @@ $ make test
 
 ### ERC20 functions
 
-Chai.sol implements the standard ERC20 functions (balanceOf, allowance, approve, transfer, transferFrom).
+Chai.sol implements the standard ERC20 functions (balanceOf, allowance, approve, transfer, transferFrom). 
+
+Similar to tokens like `WETH`, `MKR` and `DAI`, an allowance of `uint(-1)` is treated as "infinity", so `transferFrom` calls from an address that has been given an allowance of `uint(-1)` will not cause the allowance to decrease.
 
 ### Join 
 
