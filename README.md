@@ -15,7 +15,7 @@ You can interact with the Chai contract at [chai.money](https://chai.money). The
 ## audit
 
 The deployed `chai` contract underwent a two day audit by Trail Of Bits in the beginning of February, finding no security related issues.
-A summary can be found [here](./ToBToB_Letter_of_Attestation_Chai.pdf).
+A summary can be found [here](./ToB_Letter_of_Attestation_Chai.pdf).
 
 ## building and testing
 
